@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>⚡ Wanzz Bot — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Oxanium:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#050810; --bg2:#080d1a; --bg3:#0b1225;
+  --panel:#0d1630; --panel2:#111c3a;
+  --border:#1a2e5a; --border2:#243d6e;
+  --bolt:#f5c400; --bolt2:#ffd94d; --bolt3:#ffe680;
+  --blue:#00c3ff; --red:#ff3b3b; --green:#00ff88;
+  --text:#ccd6f6; --text2:#8892b0;
+  --glow:rgba(245,196,0,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Oxanium',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* grid bg */
+body::before{content:'';position:fixed;inset:0;background:linear-gradient(rgba(245,196,0,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(245,196,0,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+
+/* lightning */
+.lbg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.lbg span{position:absolute;width:1px;background:linear-gradient(to bottom,transparent,var(--bolt),transparent);opacity:0;animation:lbolt linear infinite}
+.lbg span:nth-child(1){left:6%;height:130px;animation-duration:4.5s;animation-delay:0s;top:-130px}
+.lbg span:nth-child(2){left:20%;height:90px;animation-duration:6.2s;animation-delay:1.4s;top:-90px}
+.lbg span:nth-child(3){left:37%;height:170px;animation-duration:3.9s;animation-delay:0.8s;top:-170px}
+.lbg span:nth-child(4){left:54%;height:110px;animation-duration:5.6s;animation-delay:2.2s;top:-110px}
+.lbg span:nth-child(5){left:70%;height:150px;animation-duration:4.8s;animation-delay:0.5s;top:-150px}
+.lbg span:nth-child(6){left:84%;height:95px;animation-duration:7.1s;animation-delay:1.9s;top:-95px}
+.lbg span:nth-child(7){left:14%;height:210px;animation-duration:5.3s;animation-delay:3.1s;top:-210px}
+.lbg span:nth-child(8){left:62%;height:120px;animation-duration:4.1s;animation-delay:2.6s;top:-120px}
+@keyframes lbolt{0%{transform:translateY(0);opacity:0}10%{opacity:.55}90%{opacity:.25}100%{transform:translateY(110vh);opacity:0}}
+
+/* ── AUTH ── */
+.auth{position:fixed;inset:0;background:rgba(5,8,16,.97);z-index:200;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(10px)}
+.auth-box{background:var(--panel);border:1px solid var(--border);border-top:2px solid var(--bolt);border-radius:14px;padding:40px 32px;width:min(400px,93vw);text-align:center}
+.auth-bolt{font-size:48px;filter:drop-shadow(0 0 18px var(--bolt));animation:pbolt 2s ease-in-out infinite alternate;display:block;margin-bottom:14px}
+@keyframes pbolt{from{filter:drop-shadow(0 0 10px var(--bolt))}to{filter:drop-shadow(0 0 32px var(--bolt)) drop-shadow(0 0 60px rgba(245,196,0,.4))}}
+.auth-title{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;letter-spacing:6px;background:linear-gradient(135deg,var(--bolt2),#fff 40%,var(--bolt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.auth-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);letter-spacing:3px;margin-bottom:26px}
+.auth-err{color:var(--red);font-family:'Share Tech Mono',monospace;font-size:11px;margin-bottom:10px;display:none}
+
+/* ── LAYOUT ── */
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:20px 14px 70px}
+
+/* ── HEADER ── */
+header{text-align:center;padding:36px 0 28px}
+.h-bolt{font-size:50px;filter:drop-shadow(0 0 18px var(--bolt));animation:pbolt 2s ease-in-out infinite alternate;display:block;margin-bottom:10px}
+.h-title{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,6vw,48px);font-weight:700;letter-spacing:5px;background:linear-gradient(135deg,var(--bolt2),#fff 40%,var(--bolt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.h-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);letter-spacing:3px;margin-top:5px}
+.h-line{height:1px;background:linear-gradient(90deg,transparent,var(--bolt),var(--blue),var(--bolt),transparent);margin-top:26px;box-shadow:0 0 12px var(--bolt)}
+
+/* ── STATUS ── */
+.status{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:7px;padding:10px 16px;margin-bottom:26px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);flex-wrap:wrap;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.status-txt{color:var(--green)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;padding:9px 18px;border-radius:7px;border:1px solid var(--border);background:var(--panel);color:var(--text2);cursor:pointer;transition:all .2s;text-transform:uppercase}
+.tab.active,.tab:hover{border-color:var(--bolt);color:var(--bolt2);background:rgba(245,196,0,.07);box-shadow:0 0 14px var(--glow)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ── SECTION TITLE ── */
+.stitle{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.stitle h2{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--bolt2)}
+.stitle::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+
+/* ── CARD ── */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:22px;margin-bottom:18px;position:relative;overflow:hidden;transition:border-color .25s,box-shadow .25s}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--bolt),var(--blue),var(--bolt));opacity:0;transition:opacity .3s}
+.card:hover{border-color:rgba(245,196,0,.3);box-shadow:0 0 22px var(--glow)}
+.card:hover::before{opacity:1}
+
+/* ── FORM ── */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.grid.g3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:640px){.grid,.grid.g3{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg.full{grid-column:1/-1}
+label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.lico{font-size:12px}
+input[type=text],input[type=password],input[type=number],select,textarea{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Oxanium',sans-serif;font-size:14px;padding:9px 13px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+textarea{resize:vertical;min-height:70px}
+input:focus,select:focus,textarea:focus{border-color:var(--bolt);box-shadow:0 0 0 3px rgba(245,196,0,.1)}
+input::placeholder,textarea::placeholder{color:var(--text2);opacity:.45}
+select option{background:var(--bg3)}
+.field-cur{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);margin-top:3px;padding:3px 8px;background:rgba(255,255,255,.03);border-radius:4px;word-break:break-all}
+.field-cur span{color:var(--bolt3)}
+
+/* ── BUTTON ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 22px;border:none;border-radius:7px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;text-transform:uppercase}
+.btn-bolt{background:linear-gradient(135deg,#c49a00,var(--bolt),#ffd94d);color:#0a0800;box-shadow:0 0 14px rgba(245,196,0,.3),0 2px 6px rgba(0,0,0,.4)}
+.btn-bolt:hover{transform:translateY(-2px);box-shadow:0 0 26px rgba(245,196,0,.5),0 4px 14px rgba(0,0,0,.4)}
+.btn-bolt:disabled{opacity:.5;pointer-events:none}
+.btn-outline{background:transparent;color:var(--bolt2);border:1px solid var(--bolt);box-shadow:0 0 7px rgba(245,196,0,.1)}
+.btn-outline:hover{background:rgba(245,196,0,.07);box-shadow:0 0 14px rgba(245,196,0,.22)}
+.btn-danger{background:linear-gradient(135deg,#7a0000,var(--red));color:#fff;box-shadow:0 0 12px rgba(255,59,59,.25)}
+.btn-danger:hover{transform:translateY(-2px);box-shadow:0 0 22px rgba(255,59,59,.45)}
+.btn-blue{background:linear-gradient(135deg,#003d7a,var(--blue));color:#fff;box-shadow:0 0 12px rgba(0,195,255,.2)}
+.btn-blue:hover{transform:translateY(-2px);box-shadow:0 0 22px rgba(0,195,255,.4)}
+.btn-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+
+/* ── DIVIDER ── */
+.div{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:20px 0}
+
+/* ── TOAST ── */
+.twrap{position:fixed;bottom:22px;right:18px;z-index:999;display:flex;flex-direction:column;gap:9px;pointer-events:none}
+.toast{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 16px;font-family:'Share Tech Mono',monospace;font-size:12px;display:flex;align-items:center;gap:9px;min-width:210px;pointer-events:auto;box-shadow:0 4px 22px rgba(0,0,0,.5);animation:slideIn .3s ease;opacity:1;transition:opacity .3s}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--bolt)}
+@keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── SAVE INDICATOR ── */
+.save-ind{display:none;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--bolt2)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(245,196,0,.3);border-top-color:var(--bolt);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── LOG ── */
+.log-list{display:flex;flex-direction:column;gap:7px;max-height:240px;overflow-y:auto}
+.log-list::-webkit-scrollbar{width:3px}
+.log-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.log-item{display:flex;align-items:flex-start;gap:9px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 11px;font-family:'Share Tech Mono',monospace;font-size:11px}
+.lt{color:var(--text2);min-width:65px;flex-shrink:0}
+.lf{color:var(--bolt2);min-width:110px;flex-shrink:0}
+.lv{color:var(--green);word-break:break-all}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:3px;background:rgba(245,196,0,.1);border:1px solid rgba(245,196,0,.28);border-radius:4px;padding:2px 7px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--bolt2);letter-spacing:1px}
+.badge-green{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.25);color:var(--green)}
+.badge-red{background:rgba(255,59,59,.08);border-color:rgba(255,59,59,.25);color:var(--red)}
+
+/* server url input */
+.server-bar{display:flex;gap:8px;margin-bottom:18px;align-items:center;flex-wrap:wrap}
+.server-bar input{flex:1;min-width:180px}
+</style>
+</head>
+<body>
+
+<div class="lbg">
+  <span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span>
+</div>
+
+<!-- AUTH -->
+<div class="auth" id="authEl">
+  <div class="auth-box">
+    <span class="auth-bolt">⚡</span>
+    <div class="auth-title">WANZZ PANEL</div>
+    <div class="auth-sub">ADMIN ACCESS REQUIRED</div>
+    <input type="password" id="pwIn" placeholder="Password admin..." style="margin-bottom:12px"/>
+    <div class="auth-err" id="authErr">❌ Password salah!</div>
+    <button class="btn btn-bolt" style="width:100%" onclick="doLogin()">⚡ MASUK</button>
+  </div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:2px;margin-top:8px">WANZZ BOT © 2026</div>
+</div>
+
+<!-- TOAST -->
+<div class="twrap" id="tw"></div>
+
+<!-- MAIN -->
+<div class="wrap" id="main" style="display:none">
+
+  <header>
+    <span class="h-bolt">⚡</span>
+    <div class="h-title">Wanzz Bot</div>
+    <div class="h-sub">Admin Control Panel — Direct Settings Editor</div>
+    <div class="h-line"></div>
+  </header>
+
+  <!-- STATUS -->
+  <div class="status">
+    <div class="dot"></div>
+    <span class="status-txt">PANEL AKTIF</span>
+    <span>—</span>
+    <span id="clk">--:--:--</span>
+    <span style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <span class="badge" id="connBadge">⚡ OFFLINE</span>
+      <span class="badge">v10.0.0</span>
+    </span>
+  </div>
+
+  <!-- SERVER URL BAR -->
+  <div class="card" style="padding:16px">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:2px;margin-bottom:10px">⚡ SERVER BACKEND URL</div>
+    <div class="server-bar">
+      <input type="text" id="serverUrl" placeholder="http://localhost:3000" value="http://localhost:3000"/>
+      <button class="btn btn-blue" onclick="testConn()">🔗 TEST KONEKSI</button>
+      <button class="btn btn-outline" onclick="loadSettings()">📥 LOAD SETTINGS</button>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2)">
+      Jalankan <span style="color:var(--bolt2)">node server.js</span> di folder bot, lalu klik Load Settings untuk ambil nilai saat ini dari settings.js
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('bot')">🤖 Bot Info</div>
+    <div class="tab" onclick="switchTab('owner')">👑 Owner</div>
+    <div class="tab" onclick="switchTab('payment')">💳 Payment</div>
+    <div class="tab" onclick="switchTab('panel')">🖥️ Panel</div>
+    <div class="tab" onclick="switchTab('images')">🖼️ Images</div>
+    <div class="tab" onclick="switchTab('sticker')">🃏 Stiker</div>
+    <div class="tab" onclick="switchTab('log')">📜 Log</div>
+  </div>
+
+  <!-- ══ TAB: BOT INFO ══ -->
+  <div class="tab-content active" id="tab-bot">
+    <div class="stitle"><span>⚡</span><h2>Identitas Bot</h2></div>
+    <div class="card">
+      <div class="grid">
+        <div class="fg">
+          <label><span class="lico">🤖</span> botname — Nama Bot Utama</label>
+          <input type="text" id="f_botname" placeholder="Wanzz" oninput="markDirty('botname')"/>
+          <div class="field-cur" id="c_botname">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">🤖</span> botname2 — Nama Bot Alternatif</label>
+          <input type="text" id="f_botname2" placeholder="Wanzz" oninput="markDirty('botname2')"/>
+          <div class="field-cur" id="c_botname2">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">📢</span> namaSaluran — Nama Channel WA</label>
+          <input type="text" id="f_namaSaluran" placeholder="Wanzz" oninput="markDirty('namaSaluran')"/>
+          <div class="field-cur" id="c_namaSaluran">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">📡</span> idSaluran — ID Channel Newsletter</label>
+          <input type="text" id="f_idSaluran" placeholder="120363xxxxxxxxx@newsletter" oninput="markDirty('idSaluran')"/>
+          <div class="field-cur" id="c_idSaluran">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">🔑</span> custompairing — Kode Pairing</label>
+          <input type="text" id="f_custompairing" placeholder="XXXXXXXX" oninput="markDirty('custompairing')"/>
+          <div class="field-cur" id="c_custompairing">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">⏱️</span> delayJpm — Delay JPM (ms)</label>
+          <input type="number" id="f_delayJpm" placeholder="3000" oninput="markDirty('delayJpm')"/>
+          <div class="field-cur" id="c_delayJpm">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">⏱️</span> delayPushkontak — Delay Push (ms)</label>
+          <input type="number" id="f_delayPushkontak" placeholder="6000" oninput="markDirty('delayPushkontak')"/>
+          <div class="field-cur" id="c_delayPushkontak">Nilai saat ini: <span>—</span></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-bolt" onclick="saveTab('bot')">⚡ SIMPAN TAB INI</button>
+        <div class="save-ind" id="si_bot"><span class="spin"></span> Menyimpan...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: OWNER ══ -->
+  <div class="tab-content" id="tab-owner">
+    <div class="stitle"><span>⚡</span><h2>Data Owner</h2></div>
+    <div class="card">
+      <div class="grid">
+        <div class="fg">
+          <label><span class="lico">📱</span> owner — Nomor WhatsApp Owner</label>
+          <input type="text" id="f_owner" placeholder="628xxxxxxxxxx" oninput="markDirty('owner')"/>
+          <div class="field-cur" id="c_owner">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">👑</span> namaOwner — Nama Owner</label>
+          <input type="text" id="f_namaOwner" placeholder="Wanzz" oninput="markDirty('namaOwner')"/>
+          <div class="field-cur" id="c_namaOwner">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">🔗</span> linkOwner — Link WhatsApp Owner</label>
+          <input type="text" id="f_linkOwner" placeholder="https://wa.me/628xxxxxxxxxx" oninput="markDirty('linkOwner')"/>
+          <div class="field-cur" id="c_linkOwner">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">👥</span> linkGrup — Link Grup WhatsApp</label>
+          <input type="text" id="f_linkGrup" placeholder="https://chat.whatsapp.com/..." oninput="markDirty('linkGrup')"/>
+          <div class="field-cur" id="c_linkGrup">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">📡</span> linkSaluran — Link Channel WhatsApp</label>
+          <input type="text" id="f_linkSaluran" placeholder="https://whatsapp.com/channel/..." oninput="markDirty('linkSaluran')"/>
+          <div class="field-cur" id="c_linkSaluran">Nilai saat ini: <span>—</span></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-bolt" onclick="saveTab('owner')">⚡ SIMPAN TAB INI</button>
+        <div class="save-ind" id="si_owner"><span class="spin"></span> Menyimpan...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: PAYMENT ══ -->
+  <div class="tab-content" id="tab-payment">
+    <div class="stitle"><span>⚡</span><h2>Pembayaran & Harga</h2></div>
+    <div class="card">
+      <div class="grid g3">
+        <div class="fg">
+          <label><span class="lico">💚</span> dana — Nomor Dana</label>
+          <input type="text" id="f_dana" placeholder="081xxxxxxxxx" oninput="markDirty('dana')"/>
+          <div class="field-cur" id="c_dana">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">💙</span> gopay — Nomor GoPay</label>
+          <input type="text" id="f_gopay" placeholder="081xxxxxxxxx" oninput="markDirty('gopay')"/>
+          <div class="field-cur" id="c_gopay">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">💰</span> harga.prem — Harga Premium (Rp)</label>
+          <input type="number" id="f_harga.prem" placeholder="5000" oninput="markDirty('harga.prem')"/>
+          <div class="field-cur" id="c_harga.prem">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">💰</span> harga.sewa — Harga Sewa Bot (Rp)</label>
+          <input type="number" id="f_harga.sewa" placeholder="10000" oninput="markDirty('harga.sewa')"/>
+          <div class="field-cur" id="c_harga.sewa">Nilai saat ini: <span>—</span></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-bolt" onclick="saveTab('payment')">⚡ SIMPAN TAB INI</button>
+        <div class="save-ind" id="si_payment"><span class="spin"></span> Menyimpan...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: PANEL ══ -->
+  <div class="tab-content" id="tab-panel">
+    <div class="stitle"><span>⚡</span><h2>Panel Server (Pterodactyl)</h2></div>
+    <div class="card">
+      <div class="grid">
+        <div class="fg">
+          <label><span class="lico">🥚</span> egg — Egg ID</label>
+          <input type="text" id="f_egg" placeholder="15" oninput="markDirty('egg')"/>
+          <div class="field-cur" id="c_egg">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">🪺</span> nestid — Nest ID</label>
+          <input type="text" id="f_nestid" placeholder="5" oninput="markDirty('nestid')"/>
+          <div class="field-cur" id="c_nestid">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">📍</span> loc — Location ID</label>
+          <input type="text" id="f_loc" placeholder="1" oninput="markDirty('loc')"/>
+          <div class="field-cur" id="c_loc">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">🌐</span> domain — Domain Panel</label>
+          <input type="text" id="f_domain" placeholder="https://panel.domain.com" oninput="markDirty('domain')"/>
+          <div class="field-cur" id="c_domain">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">🔑</span> apikey — Panel API Key (ptla...)</label>
+          <input type="text" id="f_apikey" placeholder="ptla_xxxxxxxxxxxxxxxx" oninput="markDirty('apikey')"/>
+          <div class="field-cur" id="c_apikey">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">🔑</span> capikey — Client API Key (ptlc...)</label>
+          <input type="text" id="f_capikey" placeholder="ptlc_xxxxxxxxxxxxxxxx" oninput="markDirty('capikey')"/>
+          <div class="field-cur" id="c_capikey">Nilai saat ini: <span>—</span></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-bolt" onclick="saveTab('panel')">⚡ SIMPAN TAB INI</button>
+        <div class="save-ind" id="si_panel"><span class="spin"></span> Menyimpan...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: IMAGES ══ -->
+  <div class="tab-content" id="tab-images">
+    <div class="stitle"><span>⚡</span><h2>URL Gambar Bot</h2></div>
+    <div class="card">
+      <div class="grid">
+        <div class="fg full">
+          <label><span class="lico">🏠</span> image.menu — Gambar Menu Utama</label>
+          <input type="text" id="f_image.menu" placeholder="https://..." oninput="markDirty('image.menu')"/>
+          <div class="field-cur" id="c_image.menu">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">🎬</span> image.menuv2 — Gambar Menu V2</label>
+          <input type="text" id="f_image.menuv2" placeholder="https://..." oninput="markDirty('image.menuv2')"/>
+          <div class="field-cur" id="c_image.menuv2">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">🎬</span> image.menuv3 — Gambar Menu V3</label>
+          <input type="text" id="f_image.menuv3" placeholder="https://..." oninput="markDirty('image.menuv3')"/>
+          <div class="field-cur" id="c_image.menuv3">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">👋</span> image.welcome — Banner Welcome</label>
+          <input type="text" id="f_image.welcome" placeholder="https://..." oninput="markDirty('image.welcome')"/>
+          <div class="field-cur" id="c_image.welcome">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">👋</span> image.left — Banner Left/Keluar</label>
+          <input type="text" id="f_image.left" placeholder="https://..." oninput="markDirty('image.left')"/>
+          <div class="field-cur" id="c_image.left">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">💬</span> image.reply — Logo Reply Pesan</label>
+          <input type="text" id="f_image.reply" placeholder="https://..." oninput="markDirty('image.reply')"/>
+          <div class="field-cur" id="c_image.reply">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">🎨</span> image.canvas — Gambar Canvas</label>
+          <input type="text" id="f_image.canvas" placeholder="https://..." oninput="markDirty('image.canvas')"/>
+          <div class="field-cur" id="c_image.canvas">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg full">
+          <label><span class="lico">💳</span> image.qris — Gambar QRIS Pembayaran</label>
+          <input type="text" id="f_image.qris" placeholder="https://..." oninput="markDirty('image.qris')"/>
+          <div class="field-cur" id="c_image.qris">Nilai saat ini: <span>—</span></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-bolt" onclick="saveTab('images')">⚡ SIMPAN TAB INI</button>
+        <div class="save-ind" id="si_images"><span class="spin"></span> Menyimpan...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: STIKER ══ -->
+  <div class="tab-content" id="tab-sticker">
+    <div class="stitle"><span>⚡</span><h2>Setting Stiker</h2></div>
+    <div class="card">
+      <div class="grid">
+        <div class="fg">
+          <label><span class="lico">📦</span> packname — Pack Name Stiker</label>
+          <input type="text" id="f_packname" placeholder="Wanzz Ai" oninput="markDirty('packname')"/>
+          <div class="field-cur" id="c_packname">Nilai saat ini: <span>—</span></div>
+        </div>
+        <div class="fg">
+          <label><span class="lico">✍️</span> packsticker — Pack Sticker Global</label>
+          <input type="text" id="f_packsticker" placeholder="Wanzz Ai" oninput="markDirty('packsticker')"/>
+          <div class="field-cur" id="c_packsticker">Nilai saat ini: <span>—</span></div>
+        </div>
+      </div>
+      <div style="background:rgba(245,196,0,.06);border:1px solid rgba(245,196,0,.2);border-radius:7px;padding:14px;margin-top:14px">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--bolt2);letter-spacing:2px;margin-bottom:6px">ℹ️ INFO</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8">
+          Field <span style="color:var(--bolt2)">authorsticker</span> otomatis terisi:<br/>
+          <span style="color:var(--bolt3)">Date: DD/MM/YYYY HH:mm:ss<br/>Tiktok: wanzzanakbaik</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-bolt" onclick="saveTab('sticker')">⚡ SIMPAN TAB INI</button>
+        <div class="save-ind" id="si_sticker"><span class="spin"></span> Menyimpan...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: LOG ══ -->
+  <div class="tab-content" id="tab-log">
+    <div class="stitle"><span>⚡</span><h2>Riwayat Perubahan</h2></div>
+    <div class="card">
+      <div class="log-list" id="logList">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);text-align:center;padding:14px">Belum ada perubahan.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="clearLog()">🗑️ HAPUS LOG</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVE ALL -->
+  <div style="position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(5,8,16,.92);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2)">
+      Perubahan: <span id="dirtyCount" style="color:var(--bolt2)">0</span> field
+    </span>
+    <button class="btn btn-bolt" id="saveAllBtn" onclick="saveAll()" style="padding:9px 20px">⚡ SIMPAN SEMUA</button>
+    <button class="btn btn-outline" onclick="loadSettings()" style="padding:9px 16px">🔄 RELOAD</button>
+    <div class="save-ind" id="si_all" style="display:none"><span class="spin"></span> Menyimpan ke settings.js...</div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ──────────────────────────────────────────
+//  CONFIG
+// ──────────────────────────────────────────
+const PASS    = 'wanzz2026'; // Ganti sesuai PANEL_PASS di server.js
+const LOG_KEY = 'wanzz_log';
+const AUTH_KEY= 'wanzz_sess';
+
+// Field per tab
+const TAB_FIELDS = {
+  bot:     ['botname','botname2','namaSaluran','idSaluran','custompairing','delayJpm','delayPushkontak'],
+  owner:   ['owner','namaOwner','linkOwner','linkGrup','linkSaluran'],
+  payment: ['dana','gopay','harga.prem','harga.sewa'],
+  panel:   ['egg','nestid','loc','domain','apikey','capikey'],
+  images:  ['image.menu','image.menuv2','image.menuv3','image.welcome','image.left','image.reply','image.canvas','image.qris'],
+  sticker: ['packname','packsticker'],
+};
+const ALL_FIELDS = Object.values(TAB_FIELDS).flat();
+
+let dirtyFields = new Set();
+let serverToken = '';
+
+// ──────────────────────────────────────────
+//  AUTH
+// ──────────────────────────────────────────
+document.getElementById('pwIn').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogin() {
+  const pw = document.getElementById('pwIn').value;
+  if (pw === PASS) {
+    serverToken = pw;
+    sessionStorage.setItem(AUTH_KEY,'1');
+    document.getElementById('authEl').style.display = 'none';
+    document.getElementById('main').style.display   = 'block';
+    startClock(); renderLog();
+    loadSettings();
+  } else {
+    const e = document.getElementById('authErr');
+    e.style.display = 'block';
+    document.getElementById('pwIn').value = '';
+    setTimeout(()=>e.style.display='none', 3000);
+  }
+}
+if (sessionStorage.getItem(AUTH_KEY)==='1') {
+  serverToken = PASS;
+  document.getElementById('authEl').style.display = 'none';
+  document.getElementById('main').style.display   = 'block';
+  setTimeout(()=>{ startClock(); renderLog(); loadSettings(); }, 50);
+}
+
+// ──────────────────────────────────────────
+//  CLOCK
+// ──────────────────────────────────────────
+function startClock() {
+  const el = document.getElementById('clk');
+  setInterval(() => {
+    el.textContent = new Date().toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour12:false}) + ' WIB';
+  }, 1000);
+}
+
+// ──────────────────────────────────────────
+//  TABS
+// ──────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const tabs = ['bot','owner','payment','panel','images','sticker','log'];
+    t.classList.toggle('active', tabs[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ──────────────────────────────────────────
+//  DIRTY TRACKING
+// ──────────────────────────────────────────
+function markDirty(field) {
+  dirtyFields.add(field);
+  document.getElementById('dirtyCount').textContent = dirtyFields.size;
+}
+
+// ──────────────────────────────────────────
+//  API HELPERS
+// ──────────────────────────────────────────
+function getServer() {
+  return (document.getElementById('serverUrl').value || 'http://localhost:3000').replace(/\/$/,'');
+}
+function apiHeaders() {
+  return { 'Content-Type':'application/json', 'x-panel-token': serverToken };
+}
+
+async function testConn() {
+  const badge = document.getElementById('connBadge');
+  badge.textContent = '⏳ Testing...';
+  badge.className = 'badge';
+  try {
+    const r = await fetch(getServer()+'/api/settings', { headers: apiHeaders() });
+    if (r.ok) {
+      badge.textContent = '✅ ONLINE';
+      badge.className = 'badge badge-green';
+      showToast('success','✅','Koneksi berhasil!');
+    } else throw new Error('Auth failed');
+  } catch(e) {
+    badge.textContent = '❌ OFFLINE';
+    badge.className = 'badge badge-red';
+    showToast('error','❌','Gagal konek ke backend!');
+  }
+}
+
+// ──────────────────────────────────────────
+//  LOAD SETTINGS dari settings.js via backend
+// ──────────────────────────────────────────
+async function loadSettings() {
+  try {
+    const r = await fetch(getServer()+'/api/settings', { headers: apiHeaders() });
+    if (!r.ok) { showToast('error','❌','Gagal load — cek server & koneksi'); return; }
+    const { fields } = await r.json();
+
+    // Isi semua input + tampilkan nilai saat ini
+    ALL_FIELDS.forEach(key => {
+      const inp = document.getElementById('f_'+key);
+      const cur = document.getElementById('c_'+key);
+      const val = fields[key] || '';
+      if (inp) inp.value = val;
+      if (cur) cur.innerHTML = `Nilai saat ini: <span>${val || '—'}</span>`;
+    });
+
+    dirtyFields.clear();
+    document.getElementById('dirtyCount').textContent = '0';
+    document.getElementById('connBadge').textContent  = '✅ ONLINE';
+    document.getElementById('connBadge').className    = 'badge badge-green';
+    showToast('success','📥','Settings berhasil di-load dari settings.js!');
+  } catch(e) {
+    showToast('error','❌','Backend tidak bisa dijangkau');
+  }
+}
+
+// ──────────────────────────────────────────
+//  SAVE ke settings.js via backend
+// ──────────────────────────────────────────
+async function doSave(fields, tabId) {
+  const changes = {};
+  fields.forEach(k => {
+    const el = document.getElementById('f_'+k);
+    if (el && el.value.trim()) changes[k] = el.value.trim();
+  });
+
+  if (!Object.keys(changes).length) { showToast('info','ℹ️','Tidak ada nilai yang diisi'); return; }
+
+  const si = document.getElementById('si_'+(tabId||'all'));
+  if (si) si.style.display = 'flex';
+
+  try {
+    const r = await fetch(getServer()+'/api/settings', {
+      method: 'POST',
+      headers: apiHeaders(),
+      body: JSON.stringify({ changes })
+    });
+    const data = await r.json();
+    if (data.ok) {
+      // Update "nilai saat ini" display
+      Object.entries(changes).forEach(([k,v]) => {
+        const cur = document.getElementById('c_'+k);
+        if (cur) cur.innerHTML = `Nilai saat ini: <span>${v}</span>`;
+        dirtyFields.delete(k);
+      });
+      document.getElementById('dirtyCount').textContent = dirtyFields.size;
+
+      // Tambah ke log
+      const now = new Date().toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour12:false});
+      const logs = JSON.parse(localStorage.getItem(LOG_KEY)||'[]');
+      Object.entries(changes).forEach(([k,v]) => logs.unshift({time:now,field:k,val:v}));
+      localStorage.setItem(LOG_KEY, JSON.stringify(logs.slice(0,60)));
+      renderLog();
+
+      showToast('success','✅', data.msg || `${Object.keys(changes).length} field disimpan ke settings.js!`);
+    } else {
+      showToast('error','❌', data.msg || 'Gagal menyimpan');
+    }
+  } catch(e) {
+    showToast('error','❌','Koneksi ke backend terputus');
+  } finally {
+    if (si) si.style.display = 'none';
+  }
+}
+
+function saveTab(tab) { doSave(TAB_FIELDS[tab], tab); }
+function saveAll()    { doSave(ALL_FIELDS, 'all'); }
+
+// ──────────────────────────────────────────
+//  LOG
+// ──────────────────────────────────────────
+function renderLog() {
+  const logs = JSON.parse(localStorage.getItem(LOG_KEY)||'[]');
+  const el   = document.getElementById('logList');
+  if (!logs.length) {
+    el.innerHTML = '<div style="font-family:\'Share Tech Mono\',monospace;font-size:11px;color:var(--text2);text-align:center;padding:14px">Belum ada perubahan.</div>';
+    return;
+  }
+  el.innerHTML = logs.map(l=>`
+    <div class="log-item">
+      <span class="lt">${l.time}</span>
+      <span class="lf">⚡ ${l.field}</span>
+      <span class="lv">→ "${l.val}"</span>
+    </div>`).join('');
+}
+function clearLog() {
+  localStorage.removeItem(LOG_KEY); renderLog();
+  showToast('info','🗑️','Log dihapus');
+}
+
+// ──────────────────────────────────────────
+//  TOAST
+// ──────────────────────────────────────────
+function showToast(type, icon, msg) {
+  const wrap = document.getElementById('tw');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span style="font-size:15px">${icon}</span><span style="color:var(--text)">${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3500);
+}
+</script>
+</body>
+</html>
